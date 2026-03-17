@@ -1,0 +1,104 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'skills/**'
+      - '.github/workflows/validate-skills.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'skills/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Skill Files
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Validate YAML frontmatter
+        run: |
+          echo "Validating skill frontmatter..."
+          python -c "
+          import yaml
+          from pathlib import Path
+          
+          for skill_file in Path('skills').rglob('SKILL.md'):
+              with open(skill_file) as f:
+                  content = f.read()
+                  if content.startswith('---'):
+                      parts = content.split('---')
+                      if len(parts) >= 3:
+                          try:
+                              yaml.safe_load(parts[1])
+                          except yaml.YAMLError as e:
+                              print(f'✗ {skill_file}: Invalid YAML - {e}')
+                              exit(1)
+          print('✓ All skills have valid frontmatter')
+          "
+
+      - name: Check required sections
+        run: |
+          echo "Checking for required sections..."
+          python -c "
+          from pathlib import Path
+          
+          required_sections = [
+              '<when_to_use>',
+              '<instructions>',
+              '<examples>',
+              '<guidelines>'
+          ]
+          
+          for skill_file in Path('skills').rglob('SKILL.md'):
+              content = skill_file.read_text()
+              for section in required_sections:
+                  if section not in content:
+                      print(f'✗ {skill_file}: Missing {section} section')
+                      exit(1)
+          
+          print('✓ All skills have required sections')
+          "
+
+      - name: Check file size limits
+        run: |
+          echo "Checking file size limits..."
+          python -c "
+          from pathlib import Path
+          
+          max_size = 500 * 1024
+          for skill_file in Path('skills').rglob('SKILL.md'):
+              size = skill_file.stat().st_size
+              if size > max_size:
+                  size_kb = size / 1024
+                  print(f'✗ {skill_file}: {size_kb:.1f}KB (max 500KB)')
+                  exit(1)
+          
+          print('✓ All skills within size limits')
+          "
+
+      - name: Validate JSON config files
+        run: |
+          echo "Validating MCP configuration files..."
+          python -c "
+          import json
+          from pathlib import Path
+          
+          for config_file in Path('mcp-configs').glob('*.json'):
+              try:
+                  with open(config_file) as f:
+                      json.load(f)
+              except json.JSONDecodeError as e:
+                  print(f'✗ {config_file}: {e}')
+                  exit(1)
+          
+          print('✓ All MCP configs are valid JSON')
+          "

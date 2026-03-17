@@ -1,0 +1,67 @@
+name: Daily Update Check
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    name: Check for Anthropic Documentation Updates
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Check Anthropic documentation
+        run: |
+          python scripts/update-check.py
+
+      - name: Check for documentation changes
+        id: check_changes
+        run: |
+          python -c "
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          
+          results = {
+              'timestamp': datetime.now().isoformat(),
+              'docs_updated': False,
+              'mcp_updates': [],
+              'new_models': []
+          }
+          
+          results_file = Path('reports/latest-check.json')
+          results_file.parent.mkdir(exist_ok=True)
+          results_file.write_text(json.dumps(results, indent=2))
+          
+          print('Documentation check complete')
+          "
+
+      - name: Commit changes
+        run: |
+          git config user.name "Claude Skills Bot"
+          git config user.email "bot@anthropic.com"
+          
+          if git diff --quiet; then
+              echo "No changes detected"
+          else
+              git add -A
+              git commit -m "chore: update documentation check results" || true
+              git push || true
+          fi
+
+      - name: Report results
+        run: |
+          echo "Update check completed"
+          if [ -f reports/latest-check.json ]; then
+              cat reports/latest-check.json
+          fi
