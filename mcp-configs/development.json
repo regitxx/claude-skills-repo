@@ -1,0 +1,62 @@
+{
+  "name": "development",
+  "description": "Development and engineering MCP servers",
+  "version": "1.0.0",
+  "requires": ["core.json"],
+  "servers": [
+    {
+      "name": "playwright",
+      "description": "Browser automation and testing",
+      "enabled": true,
+      "config": {
+        "headless": true,
+        "timeout_ms": 30000,
+        "default_browser": "chromium"
+      }
+    },
+    {
+      "name": "postgresql",
+      "description": "PostgreSQL database operations",
+      "enabled": false,
+      "config": {
+        "connection_pool_size": 10,
+        "timeout_seconds": 5,
+        "ssl_enabled": true
+      }
+    },
+    {
+      "name": "docker",
+      "description": "Docker container management",
+      "enabled": true,
+      "config": {
+        "socket": "unix:///var/run/docker.sock",
+        "timeout_seconds": 60
+      }
+    },
+    {
+      "name": "terraform",
+      "description": "Infrastructure as code management",
+      "enabled": false,
+      "config": {
+        "auto_approve": false,
+        "parallelism": 10,
+        "workspace": "default"
+      }
+    },
+    {
+      "name": "kubernetes",
+      "description": "Kubernetes cluster management",
+      "enabled": false,
+      "config": {
+        "kubeconfig": "~/.kube/config",
+        "context": "default",
+        "namespace": "default"
+      }
+    }
+  ],
+  "shared_config": {
+    "timeout_seconds": 60,
+    "retry_attempts": 3,
+    "logging_level": "debug"
+  }
+}

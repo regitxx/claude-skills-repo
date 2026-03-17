@@ -1,0 +1,58 @@
+{
+  "name": "core",
+  "description": "Core MCP servers for essential operations",
+  "version": "1.0.0",
+  "servers": [
+    {
+      "name": "filesystem",
+      "description": "File system operations",
+      "enabled": true,
+      "config": {
+        "allowed_paths": [
+          "/home/user/projects",
+          "/tmp/claude-workspace"
+        ]
+      }
+    },
+    {
+      "name": "git",
+      "description": "Git operations and repository management",
+      "enabled": true,
+      "config": {
+        "auto_commit_enabled": false,
+        "gpg_sign": true
+      }
+    },
+    {
+      "name": "github",
+      "description": "GitHub API integration",
+      "enabled": true,
+      "config": {
+        "token_env": "GITHUB_TOKEN",
+        "rate_limit_requests_per_hour": 5000
+      }
+    },
+    {
+      "name": "memory",
+      "description": "Knowledge graph and memory management",
+      "enabled": true,
+      "config": {
+        "persistence": "disk",
+        "max_size_mb": 100
+      }
+    },
+    {
+      "name": "sequential-thinking",
+      "description": "Reflective thinking and problem-solving",
+      "enabled": true,
+      "config": {
+        "max_thoughts": 20
+      }
+    }
+  ],
+  "shared_config": {
+    "timeout_seconds": 30,
+    "retry_attempts": 3,
+    "logging_level": "info"
+  }
+}

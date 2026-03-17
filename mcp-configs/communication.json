@@ -1,0 +1,66 @@
+{
+  "name": "communication",
+  "description": "Communication and collaboration MCP servers",
+  "version": "1.0.0",
+  "requires": ["core.json"],
+  "servers": [
+    {
+      "name": "slack",
+      "description": "Slack workspace integration",
+      "enabled": true,
+      "config": {
+        "token_env": "SLACK_BOT_TOKEN",
+        "signing_secret_env": "SLACK_SIGNING_SECRET",
+        "rate_limit": {
+          "messages_per_minute": 60
+        }
+      }
+    },
+    {
+      "name": "notion",
+      "description": "Notion database and content management",
+      "enabled": false,
+      "config": {
+        "token_env": "NOTION_API_TOKEN",
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "name": "google-drive",
+      "description": "Google Drive file operations",
+      "enabled": false,
+      "config": {
+        "credentials_env": "GOOGLE_APPLICATION_CREDENTIALS",
+        "scopes": [
+          "https://www.googleapis.com/auth/drive",
+          "https://www.googleapis.com/auth/spreadsheets"
+        ]
+      }
+    },
+    {
+      "name": "email",
+      "description": "Email operations (SMTP/IMAP)",
+      "enabled": false,
+      "config": {
+        "smtp_server_env": "SMTP_SERVER",
+        "smtp_port": 587,
+        "use_tls": true,
+        "credentials_env": "EMAIL_CREDENTIALS"
+      }
+    },
+    {
+      "name": "asana",
+      "description": "Asana project management",
+      "enabled": false,
+      "config": {
+        "token_env": "ASANA_API_TOKEN",
+        "workspace": "default"
+      }
+    }
+  ],
+  "shared_config": {
+    "timeout_seconds": 30,
+    "retry_attempts": 2,
+    "logging_level": "info"
+  }
+}
